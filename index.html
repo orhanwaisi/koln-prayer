@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="de" dir="ltr" id="html-tag">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Gebetszeiten & Koran in Köln</title>
+    <!-- QRCode.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --primary: #1b4332;
+            --primary-light: #2d6a4f;
+            --accent: #d4af37;
+            --bg: #f4f6f8;
+            --card-bg: #ffffff;
+            --text: #2b2b2b;
+            --text-muted: #6c757d;
+            --border: #e9ecef;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 480px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .lang-switch {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .lang-btn.active, .lang-btn:hover {
+            background: white;
+            color: var(--primary);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            padding: 20px 20px 30px 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .date-badge {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 15px;
+            font-size: 13px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tabs-nav {
+            display: flex;
+            background: #e9ecef;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: var(--primary);
+            border-bottom: 3px solid var(--accent);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 25px 20px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .select-date-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f1f3f5;
+            padding: 8px 12px;
+            border-radius: 10px;
+        }
+
+        .select-date-container label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .select-date-container input {
+            border: 1px solid #ced4da;
+            padding: 6px 10px;
+            border-radius: 6px;
+            outline: none;
+            font-size: 13px;
+        }
+
+        .prayer-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .prayer-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 18px;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            border-right: 4px solid var(--primary-light);
+            transition: all 0.3s ease;
+        }
+
+        html[dir="ltr"] .prayer-card {
+            border-right: none;
+            border-left: 4px solid var(--primary-light);
+        }
+
+        .prayer-card.active-prayer {
+            background-color: #e8f5e9;
+            border-left-color: var(--accent);
+            border-right-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(45, 106, 79, 0.15);
+            transform: scale(1.02);
+        }
+
+        .prayer-name {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .prayer-time {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--primary);
+            direction: ltr;
+            unicode-bidi: embed;
+        }
+
+        /* قورئان و تەفسیر و دەنگ */
+        .quran-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .surah-select-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f1f3f5;
+            padding: 10px 12px;
+            border-radius: 10px;
+        }
+
+        .surah-select-box label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .surah-select-box select {
+            border: 1px solid #ced4da;
+            padding: 6px 10px;
+            border-radius: 6px;
+            outline: none;
+            font-size: 13px;
+            background: white;
+            cursor: pointer;
+            max-width: 200px;
+        }
+
+        .quran-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 18px;
+            border-top: 4px solid var(--accent);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            margin-bottom: 12px;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .quran-card.playing-card {
+            background: #e8f5e9;
+            border-top-color: var(--primary);
+            transform: scale(1.01);
+            box-shadow: 0 4px 15px rgba(27, 67, 50, 0.15);
+        }
+
+        .quran-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .audio-btn {
+            background: var(--primary-light);
+            color: white;
+            border: none;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .audio-btn:hover {
+            background: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .quran-ayah-arabic {
+            font-family: 'Traditional Arabic', 'Amiri', serif;
+            font-size: 21px;
+            color: var(--primary);
+            text-align: right;
+            line-height: 1.8;
+            direction: rtl;
+            width: 100%;
+        }
+
+        .quran-transliteration {
+            font-size: 13px;
+            color: var(--primary-light);
+            font-style: italic;
+            margin-bottom: 8px;
+            direction: ltr;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .quran-translation {
+            font-size: 14px;
+            color: var(--text);
+            margin-bottom: 10px;
+            line-height: 1.6;
+            border-top: 1px dashed var(--border);
+            padding-top: 10px;
+        }
+
+        .quran-tafsir {
+            font-size: 13px;
+            color: var(--text-muted);
+            background: #fff;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            line-height: 1.5;
+        }
+
+        .tafsir-title {
+            font-weight: bold;
+            color: var(--primary-light);
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+
+        .qr-section {
+            background-color: #fafafa;
+            border-top: 1px dashed var(--border);
+            padding: 25px 20px;
+            text-align: center;
+        }
+
+        .qr-section h3 {
+            font-size: 15px;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .qr-section p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+        }
+
+        #qrcode {
+            display: flex;
+            justify-content: center;
+            padding: 10px;
+            background: white;
+            width: fit-content;
+            margin: 0 auto;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            color: var(--text-muted);
+            background-color: #f8f9fa;
+            border-top: 1px solid var(--border);
+            line-height: 1.6;
+        }
+
+        .designer-credit {
+            font-size: 11px;
+            color: var(--primary);
+            font-weight: 600;
+            margin-top: 4px;
+            direction: ltr;
+        }
+
+        .designer-link {
+            color: var(--primary);
+            text-decoration: underline;
+            transition: color 0.2s;
+        }
+
+        .designer-link:hover {
+            color: #2d6a4f;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="lang-switch">
+            <button class="lang-btn active" id="btn-de" onclick="changeLanguage('de')">Deutsch</button>
+            <button class="lang-btn" id="btn-ku" onclick="changeLanguage('ku')">کوردی</button>
+            <button class="lang-btn" id="btn-fa" onclick="changeLanguage('fa')">فارسی</button>
+            <button class="lang-btn" id="btn-tr" onclick="changeLanguage('tr')">Türkçe</button>
+            <button class="lang-btn" id="btn-ar" onclick="changeLanguage('ar')">العربية</button>
+        </div>
+        <h1 id="title-text">Gebetszeiten & Koran</h1>
+        <p id="city-text">in der Stadt Köln</p>
+        <div class="date-badge" id="current-date-text">Laden...</div>
+    </div>
+
+    <!-- تابی سەرەکی -->
+    <div class="tabs-nav">
+        <button class="tab-btn active" id="tab-btn-prayer" onclick="switchTab('prayer')">Prayer Times</button>
+        <button class="tab-btn" id="tab-btn-quran" onclick="switchTab('quran')">Al-Quran</button>
+    </div>
+
+    <div class="content">
+        <!-- بەشی کاتەکانی نوێژ -->
+        <div class="tab-content active" id="content-prayer">
+            <div class="select-date-container">
+                <label for="date-picker" id="lbl-select-date">Datum auswählen:</label>
+                <input type="date" id="date-picker">
+            </div>
+
+            <div class="prayer-list" id="prayer-list-container">
+                <div class="prayer-card" id="card-Fajr">
+                    <span class="prayer-name"><span>🌅</span> <span id="lbl-fajr">Fajr (Morgengebet)</span></span>
+                    <span class="prayer-time" id="time-Fajr">--:--</span>
+                </div>
+                <div class="prayer-card" id="card-Sunrise">
+                    <span class="prayer-name"><span>☀️</span> <span id="lbl-sunrise">Sonnenaufgang</span></span>
+                    <span class="prayer-time" id="time-Sunrise">--:--</span>
+                </div>
+                <div class="prayer-card" id="card-Dhuhr">
+                    <span class="prayer-name"><span>☀️</span> <span id="lbl-dhuhr">Dhuhr (Mittagsgebet)</span></span>
+                    <span class="prayer-time" id="time-Dhuhr">--:--</span>
+                </div>
+                <div class="prayer-card" id="card-Asr">
+                    <span class="prayer-name"><span>🌤️</span> <span id="lbl-asr">Asr (Nachmittagsgebet)</span></span>
+                    <span class="prayer-time" id="time-Asr">--:--</span>
+                </div>
+                <div class="prayer-card" id="card-Maghrib">
+                    <span class="prayer-name"><span>🌅</span> <span id="lbl-maghrib">Maghrib (Abendgebet)</span></span>
+                    <span class="prayer-time" id="time-Maghrib">--:--</span>
+                </div>
+                <div class="prayer-card" id="card-Isha">
+                    <span class="prayer-name"><span>🌙</span> <span id="lbl-isha">Isha (Nachtgebet)</span></span>
+                    <span class="prayer-time" id="time-Isha">--:--</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- بەشی قورئانی پیرۆز -->
+        <div class="tab-content" id="content-quran">
+            <div class="quran-container">
+                <div class="surah-select-box">
+                    <label for="surah-select" id="lbl-select-surah">Surah:</label>
+                    <select id="surah-select" onchange="loadSurahFromAPI()">
+                        <!-- ١١٤ سۆرەتەکە -->
+                    </select>
+                </div>
+                <div id="quran-display-area">
+                    <div style="text-align: center; padding: 20px; color: var(--text-muted);" id="loading-msg">Lade Sure...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="qr-section">
+        <h3 id="lbl-qr-title">QR-Code für diese Seite</h3>
+        <p id="lbl-qr-desc">Scannen Sie diesen Code, um diese App direkt zu sehen</p>
+        <div id="qrcode"></div>
+    </div>
+
+    <div class="footer">
+        <div id="lbl-footer">Gebetszeiten in der Stadt Köln ©</div>
+        <div class="designer-credit">
+            Designed by <a class="designer-link" href="https://wa.me/4915901166558" target="_blank" rel="noopener">Orhan Waisi</a> KTX 284 & KTX 715
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentLang = 'de';
+    let currentTab = 'prayer';
+    let currentAudio = null;
+    let currentAyahIndex = -1;
+    let ayahsAudioList = [];
+
+    const EXTRA_DELAY = 3;
+    const MOSQUE_ID = "taqiyyudin-al-hilaly-koln";
+    let rawTimes = ["--:--", "--:--", "--:--", "--:--", "--:--", "--:--"];
+
+    const surahListNames = [
+        "Al-Fatihah", "Al-Baqarah", "Ali 'Imran", "An-Nisa'", "Al-Ma'idah", "Al-An'am", "Al-A'raf", "Al-Anfal", "At-Tawbah", "Yunus",
+        "Hud", "Yusuf", "Ar-Ra'd", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra'", "Al-Kahf", "Maryam", "Taha",
+        "Al-Anbiya'", "Al-Hajj", "Al-Mu'minun", "An-Nur", "Al-Furqan", "Ash-Shu'ara'", "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum",
+        "Luqman", "As-Sajdah", "Al-Ahzab", "Saba'", "Fatir", "Ya-Sin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir",
+        "Fussilat", "Ash-Shuraa", "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiyah", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf",
+        "Ad-Dhariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'ah", "Al-Hadid", "Al-Mujadila", "Al-Hashr", "Al-Mumtahana",
+        "As-Saff", "Al-Jumu'ah", "Al-Munafiqun", "At-Taghabun", "At-Talaq", "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij",
+        "Nuh", "Al-Jinn", "Al-Muzzammil", "Al-Muddaththir", "Al-Qiyamah", "Al-Insan", "Al-Mursalat", "An-Naba'", "An-Nazi'at", "'Abasa",
+        "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq", "Al-Buruj", "At-Tariq", "Al-A'la", "Al-Ghashiyah", "Al-Fajr", "Al-Balad",
+        "Ash-Shams", "Al-Lail", "Ad-Duha", "Ash-Sharh", "At-Tin", "Al-'Alaq", "Al-Qadr", "Al-Bayyinah", "Az-Zalzalah", "Al-'Adiyat",
+        "Al-Qari'ah", "At-Takathur", "Al-Asr", "Al-Humazah", "Al-Fil", "Quraish", "Al-Ma'un", "Al-Kauthar", "Al-Kafirun", "An-Nasr",
+        "Al-Masad", "Al-Ikhlas", "Al-Falaq", "An-Nas"
+    ];
+
+    const translations = {
+        de: {
+            dir: 'ltr',
+            title: 'Gebetszeiten & Koran',
+            city: 'in der Stadt Köln',
+            selectDate: 'Datum auswählen:',
+            fajr: 'Fajr (Morgengebet)',
+            sunrise: 'Sonnenaufgang',
+            dhuhr: 'Dhuhr (Mittagsgebet)',
+            asr: 'Asr (Nachmittagsgebet)',
+            maghrib: 'Maghrib (Abendgebet)',
+            isha: 'Isha (Nachtgebet)',
+            qrTitle: 'QR-Code für diese Seite',
+            qrDesc: 'Scannen Sie diesen Code, um diese App direkt zu sehen',
+            footer: 'Gebetszeiten in der Stadt Köln ©',
+            datePrefix: 'Datum: ',
+            tabPrayer: 'Gebetszeiten',
+            tabQuran: 'Der Koran',
+            selectSurah: 'Sure auswählen:',
+            tafsirLabel: 'Tafsir (Erläuterung):',
+            transEdition: 'de.asad',
+            tafsirEdition: 'de.aburida',
+            transliterationNeeded: true,
+            showTranslation: true
+        },
+        ku: {
+            dir: 'rtl',
+            title: 'کاتەکانی نوێژ و قورئان',
+            city: 'بە شاری کۆڵن',
+            selectDate: 'دیاریکردنی بەروار:',
+            fajr: 'بەیانی (Fajr)',
+            sunrise: 'ڕۆژهەڵاتن (Sunrise)',
+            dhuhr: 'نیوەڕۆ (Dhuhr)',
+            asr: 'عەسر (Asr)',
+            maghrib: 'ئێوارە (Maghrib)',
+            isha: 'عیشا (Isha)',
+            qrTitle: 'کۆدی QR بۆ ئەم لاپەڕەیە',
+            qrDesc: 'مۆبایلەکەت بێنە بەر ئەم کۆدە بۆ ئەوەی ڕاستەوخۆ ئەم ئەپپە ببینیت',
+            footer: 'کاتی نوێژ بە شاری کۆڵن ©',
+            datePrefix: 'بەروار: ',
+            tabPrayer: 'کاتەکانی نوێژ',
+            tabQuran: 'قورئانی پیرۆز',
+            selectSurah: 'هەڵبژاردنی سۆرەت:',
+            tafsirLabel: 'تەفسیر (کوردی):',
+            transEdition: 'ku.asan',
+            tafsirEdition: 'ku.asan',
+            transliterationNeeded: false,
+            showTranslation: false
+        },
+        fa: {
+            dir: 'rtl',
+            title: 'اوقات شرعی و قرآن کریم',
+            city: 'در شهر کلن',
+            selectDate: 'انتخاب تاریخ:',
+            fajr: 'فجر (Fajr)',
+            sunrise: 'طلوع آفتاب (Sunrise)',
+            dhuhr: 'ظهر (Dhuhr)',
+            asr: 'عصر (Asr)',
+            maghrib: 'مغرب (Maghrib)',
+            isha: 'عشا (Isha)',
+            qrTitle: 'کد QR این صفحه',
+            qrDesc: 'برای مشاهده مستقیم این برنامه، این کد را اسکن کنید',
+            footer: 'اوقات شرعی در شهر کلن ©',
+            datePrefix: 'تاریخ: ',
+            tabPrayer: 'اوقات شرعی',
+            tabQuran: 'قرآن کریم',
+            selectSurah: 'انتخاب سوره:',
+            tafsirLabel: 'تفسیر (فارسی):',
+            transEdition: 'fa.makarem',
+            tafsirEdition: 'fa.makarem',
+            transliterationNeeded: true,
+            showTranslation: false
+        },
+        tr: {
+            dir: 'ltr',
+            title: 'Namaz Vakitleri ve Kuran',
+            city: 'Köln Şehri',
+            selectDate: 'Tarih Seçin:',
+            fajr: 'İmsak (Fajr)',
+            sunrise: 'Güneş',
+            dhuhr: 'Öğle (Dhuhr)',
+            asr: 'İkindi (Asr)',
+            maghrib: 'Akşam (Maghrib)',
+            isha: 'Yatsı (Isha)',
+            qrTitle: 'Bu Sayfanın QR Kodu',
+            qrDesc: 'Bu uygulamayı doğrudan görmek için bu kodu tarayın',
+            footer: 'Köln Şehri Namaz Vakitleri ©',
+            datePrefix: 'Tarih: ',
+            tabPrayer: 'Namaz Vakitleri',
+            tabQuran: 'Kuran-ı Kerim',
+            selectSurah: 'Sure Seçin:',
+            tafsirLabel: 'Tefsir (Türkçe):',
+            transEdition: 'tr.yazir',
+            tafsirEdition: 'tr.yazir',
+            transliterationNeeded: true,
+            showTranslation: false
+        },
+        ar: {
+            dir: 'rtl',
+            title: 'أوقات الصلاة والقرآن الكريم',
+            city: 'في مدينة كولن',
+            selectDate: 'تحديد التاريخ:',
+            fajr: 'الفجر (Fajr)',
+            sunrise: 'الشروق (Sunrise)',
+            dhuhr: 'الظهر (Dhuhr)',
+            asr: 'العصر (Asr)',
+            maghrib: 'المغرب (Maghrib)',
+            isha: 'العشاء (Asr)',
+            qrTitle: 'رمز QR لهذه الصفحة',
+            qrDesc: 'امسح هذا الرمز لرؤية هذا التطبيق مباشرة',
+            footer: 'أوقات الصلاة في مدينة كولن ©',
+            datePrefix: 'التاريخ: ',
+            tabPrayer: 'أوقات الصلاة',
+            tabQuran: 'القرآن الكريم',
+            selectSurah: 'اختر السورة:',
+            tafsirLabel: 'التفسير الميسر:',
+            transEdition: 'ar.muyassar',
+            tafsirEdition: 'ar.muyassar',
+            transliterationNeeded: false,
+            showTranslation: false
+        }
+    };
+
+    function populateSurahDropdown() {
+        const select = document.getElementById('surah-select');
+        select.innerHTML = '';
+        surahListNames.forEach((name, index) => {
+            const opt = document.createElement('option');
+            opt.value = index + 1;
+            opt.innerText = `${index + 1}. ${name}`;
+            select.appendChild(opt);
+        });
+    }
+
+    function stopAllAudio() {
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio = null;
+        }
+        currentAyahIndex = -1;
+        document.querySelectorAll('.audio-btn').forEach(b => b.innerHTML = '▶');
+        document.querySelectorAll('.quran-card').forEach(c => c.classList.remove('playing-card'));
+    }
+
+    function playAyah(index) {
+        if (index < 0 || index >= ayahsAudioList.length) {
+            stopAllAudio();
+            return;
+        }
+
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio = null;
+        }
+
+        document.querySelectorAll('.audio-btn').forEach(b => b.innerHTML = '▶');
+        document.querySelectorAll('.quran-card').forEach(c => c.classList.remove('playing-card'));
+
+        currentAyahIndex = index;
+        const item = ayahsAudioList[index];
+        
+        const btnElement = document.getElementById(`audio-btn-${index}`);
+        const cardElement = document.getElementById(`ayah-card-${index}`);
+
+        if (btnElement) btnElement.innerHTML = '⏸';
+        if (cardElement) {
+            cardElement.classList.add('playing-card');
+            cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        currentAudio = new Audio(item.url);
+        currentAudio.play().catch(() => {
+            if (btnElement) btnElement.innerHTML = '▶';
+        });
+
+        currentAudio.onended = function() {
+            playAyah(index + 1);
+        };
+    }
+
+    function toggleAyahPlay(index, audioUrl) {
+        if (currentAyahIndex === index && currentAudio && !currentAudio.paused) {
+            stopAllAudio();
+        } else {
+            playAyah(index);
+        }
+    }
+
+    async function loadSurahFromAPI() {
+        const surahId = document.getElementById('surah-select').value;
+        const displayArea = document.getElementById('quran-display-area');
+        const t = translations[currentLang];
+
+        stopAllAudio();
+        ayahsAudioList = [];
+
+        displayArea.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-muted);">Lade Sure ${surahId}...</div>`;
+
+        try {
+            const arabicRes = await fetch(`https://api.alquran.cloud/v1/surah/${surahId}/ar.alafasy`);
+            const arabicData = await arabicRes.json();
+
+            let transData = null;
+            if (t.showTranslation) {
+                const transRes = await fetch(`https://api.alquran.cloud/v1/surah/${surahId}/${t.transEdition}`);
+                transData = await transRes.json();
+            }
+
+            let translitData = null;
+            if (t.transliterationNeeded) {
+                const translitRes = await fetch(`https://api.alquran.cloud/v1/surah/${surahId}/en.transliteration`);
+                translitData = await translitRes.json();
+            }
+
+            const tafsirRes = await fetch(`https://api.alquran.cloud/v1/surah/${surahId}/${t.tafsirEdition}`);
+            const tafsirData = await tafsirRes.json();
+
+            if (arabicData.code === 200) {
+                const ayahsAr = arabicData.data.ayahs;
+                const ayahsTr = (transData && transData.code === 200) ? transData.data.ayahs : null;
+                const ayahsTranslit = (translitData && translitData.code === 200) ? translitData.data.ayahs : null;
+                const ayahsTafsir = (tafsirData && tafsirData.code === 200) ? tafsirData.data.ayahs : null;
+
+                displayArea.innerHTML = '';
+
+                for (let i = 0; i < ayahsAr.length; i++) {
+                    ayahsAudioList.push({
+                        url: ayahsAr[i].audio,
+                        number: ayahsAr[i].numberInSurah
+                    });
+
+                    const card = document.createElement('div');
+                    card.className = 'quran-card';
+                    card.id = `ayah-card-${i}`;
+
+                    const arText = ayahsAr[i].text;
+                    const trText = ayahsTr ? ayahsTr[i].text : "";
+                    const translitText = ayahsTranslit ? ayahsTranslit[i].text : "";
+                    const tafsirText = ayahsTafsir ? ayahsTafsir[i].text : "Keine Erläuterung verfügbar.";
+
+                    let translitHtml = '';
+                    if (t.transliterationNeeded && translitText) {
+                        translitHtml = `<div class="quran-transliteration">${translitText}</div>`;
+                    }
+
+                    let translationHtml = '';
+                    if (t.showTranslation && trText) {
+                        translationHtml = `<div class="quran-translation"><strong>${ayahsAr[i].numberInSurah}.</strong> ${trText}</div>`;
+                    }
+
+                    card.innerHTML = `
+                        <div class="quran-header-row">
+                            <button class="audio-btn" id="audio-btn-${i}" onclick="toggleAyahPlay(${i}, '${ayahsAr[i].audio}')">▶</button>
+                            <div class="quran-ayah-arabic">${arText} (${ayahsAr[i].numberInSurah})</div>
+                        </div>
+                        ${translitHtml}
+                        ${translationHtml}
+                        <div class="quran-tafsir">
+                            <div class="tafsir-title">${t.tafsirLabel}</div>
+                            ${tafsirText}
+                        </div>
+                    `;
+                    displayArea.appendChild(card);
+                }
+            } else {
+                displayArea.innerHTML = `<div style="text-align: center; padding: 20px; color: red;">Fehler beim Laden der Sure.</div>`;
+            }
+        } catch (error) {
+            displayArea.innerHTML = `<div style="text-align: center; padding: 20px; color: red;">Netzwerkfehler aufgetreten.</div>`;
+        }
+    }
+
+    function switchTab(tabName) {
+        currentTab = tabName;
+        stopAllAudio();
+
+        document.getElementById('content-prayer').classList.remove('active');
+        document.getElementById('content-quran').classList.remove('active');
+        document.getElementById('tab-btn-prayer').classList.remove('active');
+        document.getElementById('tab-btn-quran').classList.remove('active');
+
+        if (tabName === 'prayer') {
+            document.getElementById('content-prayer').classList.add('active');
+            document.getElementById('tab-btn-prayer').classList.add('active');
+        } else {
+            document.getElementById('content-quran').classList.add('active');
+            document.getElementById('tab-btn-quran').classList.add('active');
+            if(document.getElementById('quran-display-area').children.length <= 1) {
+                loadSurahFromAPI();
+            }
+        }
+    }
+
+    function addMinutes(timeStr, minutes) {
+        if (!timeStr) return "--:--";
+        const parts = timeStr.split(':');
+        let date = new Date();
+        date.setHours(parseInt(parts[0], 10), parseInt(parts[1], 10), 0);
+        date.setMinutes(date.getMinutes() + minutes);
+
+        const h = String(date.getHours()).padStart(2, '0');
+        const m = String(date.getMinutes()).padStart(2, '0');
+        return `${h}:${m}`;
+    }
+
+    function timeToSeconds(timeStr) {
+        if (!timeStr || timeStr === "--:--") return -1;
+        const parts = timeStr.split(':');
+        return parseInt(parts[0], 10) * 3600 + parseInt(parts[1], 10) * 60;
+    }
+
+    function updateTimesDisplay() {
+        if (currentTab !== 'prayer') return;
+
+        const cardIds = ['card-Fajr', 'card-Sunrise', 'card-Dhuhr', 'card-Asr', 'card-Maghrib', 'card-Isha'];
+        const timeIds = ['time-Fajr', 'time-Sunrise', 'time-Dhuhr', 'time-Asr', 'time-Maghrib', 'time-Isha'];
+
+        let adjustedTimes = [];
+        for (let i = 0; i < rawTimes.length; i++) {
+            if (rawTimes[i] && rawTimes[i] !== "--:--") {
+                adjustedTimes.push(addMinutes(rawTimes[i], EXTRA_DELAY));
+            } else {
+                adjustedTimes.push("--:--");
+            }
+            document.getElementById(cardIds[i]).classList.remove('active-prayer');
+        }
+
+        const now = new Date();
+        const currentTotalSeconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+
+        let timeSecondsList = adjustedTimes.map(t => timeToSeconds(t));
+        let nextIndex = -1;
+
+        for (let i = 0; i < timeSecondsList.length; i++) {
+            if (timeSecondsList[i] !== -1) {
+                if (currentTotalSeconds < timeSecondsList[i]) {
+                    nextIndex = i;
+                    break;
+                }
+            }
+        }
+
+        if (nextIndex === -1) {
+            nextIndex = 0;
+        }
+
+        for (let i = 0; i < 6; i++) {
+            if (i === nextIndex && adjustedTimes[i] !== "--:--") {
+                const cardEl = document.getElementById(cardIds[i]);
+                cardEl.classList.add('active-prayer');
+
+                let targetSeconds = timeSecondsList[i];
+                if (i === 0 && currentTotalSeconds >= timeSecondsList[5]) {
+                    targetSeconds += 86400;
+                }
+
+                let diffSeconds = targetSeconds - currentTotalSeconds;
+                if (diffSeconds < 0) diffSeconds = 0;
+
+                const remHours = Math.floor(diffSeconds / 3600);
+                const remMinutes = Math.floor((diffSeconds % 3600) / 60);
+                const remSeconds = diffSeconds % 60;
+
+                const hStr = String(remHours).padStart(2, '0');
+                const mStr = String(remMinutes).padStart(2, '0');
+                const sStr = String(remSeconds).padStart(2, '0');
+
+                document.getElementById(timeIds[i]).innerText = `${hStr}:${mStr}:${sStr}`;
+            } else {
+                document.getElementById(timeIds[i]).innerText = adjustedTimes[i];
+            }
+        }
+    }
+
+    function changeLanguage(lang) {
+        currentLang = lang;
+        const t = translations[lang];
+
+        document.getElementById('html-tag').setAttribute('dir', t.dir);
+        document.getElementById('html-tag').setAttribute('lang', lang);
+        document.getElementById('title-text').innerText = t.title;
+        document.getElementById('city-text').innerText = t.city;
+        document.getElementById('lbl-select-date').innerText = t.selectDate;
+        document.getElementById('lbl-fajr').innerText = t.fajr;
+        document.getElementById('lbl-sunrise').innerText = t.sunrise;
+        document.getElementById('lbl-dhuhr').innerText = t.dhuhr;
+        document.getElementById('lbl-asr').innerText = t.asr;
+        document.getElementById('lbl-maghrib').innerText = t.maghrib;
+        document.getElementById('lbl-isha').innerText = t.isha;
+        document.getElementById('lbl-qr-title').innerText = t.qrTitle;
+        document.getElementById('lbl-qr-desc').innerText = t.qrDesc;
+        document.getElementById('lbl-footer').innerText = t.footer;
+        document.getElementById('tab-btn-prayer').innerText = t.tabPrayer;
+        document.getElementById('tab-btn-quran').innerText = t.tabQuran;
+        document.getElementById('lbl-select-surah').innerText = t.selectSurah;
+
+        const btns = document.querySelectorAll('.lang-btn');
+        btns.forEach(btn => btn.classList.remove('active'));
+        
+        const activeBtn = document.getElementById(`btn-${lang}`);
+        if(activeBtn) {
+            activeBtn.classList.add('active');
+        }
+
+        const datePickerVal = document.getElementById('date-picker').value;
+        if(datePickerVal) {
+            fetchPrayerTimes(new Date(datePickerVal));
+        }
+
+        if (currentTab === 'quran') {
+            loadSurahFromAPI();
+        }
+    }
+
+    async function fetchPrayerTimes(dateObj) {
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const t = translations[currentLang];
+        
+        document.getElementById('current-date-text').innerText = `${t.datePrefix}${year}/${month}/${day}`;
+
+        try {
+            const response = await fetch(`https://api.mawaqit.net/api/2.0/mosque/${MOSQUE_ID}`);
+            const data = await response.json();
+
+            if (data && data.times) {
+                rawTimes = data.times;
+            } else {
+                rawTimes = ["04:48", "06:19", "13:42", "17:35", "20:52", "22:22"];
+            }
+        } catch (error) {
+            rawTimes = ["04:48", "06:19", "13:42", "17:35", "20:52", "22:22"];
+        }
+        updateTimesDisplay();
+    }
+
+    function generateQRCode() {
+        const qrcodeContainer = document.getElementById("qrcode");
+        qrcodeContainer.innerHTML = "";
+        
+        new QRCode(qrcodeContainer, {
+            text: window.location.href,
+            width: 130,
+            height: 130,
+            colorDark : "#1b4332",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
+    }
+
+    window.onload = function() {
+        populateSurahDropdown();
+        const today = new Date();
+        const datePicker = document.getElementById('date-picker');
+        datePicker.value = today.toISOString().split('T')[0];
+
+        fetchPrayerTimes(today);
+        generateQRCode();
+
+        setInterval(updateTimesDisplay, 1000);
+
+        datePicker.addEventListener('change', function(e) {
+            if (e.target.value) {
+                fetchPrayerTimes(new Date(e.target.value));
+            }
+        });
+    };
+</script>
+
+</body>
+</html>

@@ -598,7 +598,6 @@
     let ayahsAudioList = [];
 
     const EXTRA_DELAY = 3;
-    const MOSQUE_ID = "taqiyyudin-al-hilaly-koln";
     let rawTimes = ["--:--", "--:--", "--:--", "--:--", "--:--", "--:--"];
 
     const surahListNames = [
@@ -1108,7 +1107,8 @@
 
     function addMinutes(timeStr, minutes) {
         if (!timeStr) return "--:--";
-        const parts = timeStr.split(':');
+        const cleanTime = timeStr.split(' ')[0]; // لادانی پاشگری وەک (CEST) ئەگەر هەبێت
+        const parts = cleanTime.split(':');
         let date = new Date();
         date.setHours(parseInt(parts[0], 10), parseInt(parts[1], 10), 0);
         date.setMinutes(date.getMinutes() + minutes);
@@ -1120,7 +1120,8 @@
 
     function timeToSeconds(timeStr) {
         if (!timeStr || timeStr === "--:--") return -1;
-        const parts = timeStr.split(':');
+        const cleanTime = timeStr.split(' ')[0];
+        const parts = cleanTime.split(':');
         return parseInt(parts[0], 10) * 3600 + parseInt(parts[1], 10) * 60;
     }
 
@@ -1234,19 +1235,28 @@
     }
 
     async function fetchPrayerTimes(dateObj) {
-        const year = dateObj.getFullYear();
-        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
         const day = String(dateObj.getDate()).padStart(2, '0');
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const year = dateObj.getFullYear();
         const t = translations[currentLang];
         
         document.getElementById('current-date-text').innerText = `${t.datePrefix}${year}/${month}/${day}`;
 
         try {
-            const response = await fetch(`https://api.mawaqit.net/api/2.0/mosque/${MOSQUE_ID}`);
+            // بەکارهێنانی Aladhan API بۆ شاری کۆڵن بە شێوەیەکی گۆڕاو بۆ هەموو ڕۆژێک
+            const response = await fetch(`https://api.aladhan.com/v1/timingsByCity/${day}-${month}-${year}?city=Cologne&country=Germany&method=2`);
             const data = await response.json();
 
-            if (data && data.times) {
-                rawTimes = data.times;
+            if (data && data.code === 200 && data.data && data.data.timings) {
+                const timings = data.data.timings;
+                rawTimes = [
+                    timings.Fajr,
+                    timings.Sunrise,
+                    timings.Dhuhr,
+                    timings.Asr,
+                    timings.Maghrib,
+                    timings.Isha
+                ];
             } else {
                 rawTimes = ["04:48", "06:19", "13:42", "17:35", "20:52", "22:22"];
             }

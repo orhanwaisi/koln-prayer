@@ -371,6 +371,37 @@
             font-size: 12px;
         }
 
+        .tafsir-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .tafsir-title-row .tafsir-title {
+            margin-bottom: 0;
+        }
+
+        .tafsir-audio-btn {
+            background: var(--primary-light);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            min-width: 26px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .tafsir-audio-btn:hover {
+            background: var(--primary);
+        }
+
         .grid-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -623,6 +654,9 @@
     let currentAudio = null;
     let currentAyahIndex = -1;
     let ayahsAudioList = [];
+    let tafsirTextList = [];
+    let currentTafsirIndex = -1;
+    let currentTafsirUtterance = null;
 
     const EXTRA_DELAY = 3;
     let rawTimes = ["--:--", "--:--", "--:--", "--:--", "--:--", "--:--"];
@@ -818,7 +852,9 @@
             transEdition: 'de.asad',
             tafsirEdition: 'de.aburida',
             transliterationNeeded: true,
-            showTranslation: true
+            showTranslation: true,
+            ttsLang: 'de-DE',
+            listenTafsir: 'Tafsir anhören'
         },
         ku: {
             dir: 'rtl',
@@ -842,7 +878,9 @@
             transEdition: 'ku.asan',
             tafsirEdition: 'ku.asan',
             transliterationNeeded: false,
-            showTranslation: false
+            showTranslation: false,
+            ttsLang: 'ckb',
+            listenTafsir: 'گوێگرتن لە تەفسیر'
         },
         fa: {
             dir: 'rtl',
@@ -866,7 +904,9 @@
             transEdition: 'fa.makarem',
             tafsirEdition: 'fa.makarem',
             transliterationNeeded: true,
-            showTranslation: false
+            showTranslation: false,
+            ttsLang: 'fa-IR',
+            listenTafsir: 'شنیدن تفسیر'
         },
         tr: {
             dir: 'ltr',
@@ -890,7 +930,9 @@
             transEdition: 'tr.yazir',
             tafsirEdition: 'tr.yazir',
             transliterationNeeded: true,
-            showTranslation: false
+            showTranslation: false,
+            ttsLang: 'tr-TR',
+            listenTafsir: 'Tefsiri dinle'
         },
         ar: {
             dir: 'rtl',
@@ -914,7 +956,9 @@
             transEdition: 'ar.muyassar',
             tafsirEdition: 'ar.muyassar',
             transliterationNeeded: false,
-            showTranslation: false
+            showTranslation: false,
+            ttsLang: 'ar-SA',
+            listenTafsir: 'استماع التفسير'
         }
     };
 
@@ -968,6 +1012,111 @@
         currentAyahIndex = -1;
         document.querySelectorAll('.audio-btn').forEach(b => b.innerHTML = '▶');
         document.querySelectorAll('.quran-card').forEach(c => c.classList.remove('playing-card'));
+        stopTafsirAudio();
+    }
+
+    function stopTafsirAudio() {
+        if (window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+        currentTafsirUtterance = null;
+        if (currentTafsirIndex !== -1) {
+            const btn = document.getElementById(`tafsir-audio-btn-${currentTafsirIndex}`);
+            if (btn) btn.innerHTML = '🔊';
+        }
+        currentTafsirIndex = -1;
+    }
+
+    const knownMaleVoiceNames = [
+        'daniel', 'markus', 'yannick', 'stefan', 'thomas', 'ralf', 'hans',
+        'majed', 'tarik', 'omar', 'khaled', 'hamed', 'yousef', 'naayf', 'maged',
+        'reza', 'farid', 'ahmad', 'ali', 'vahid', 'dariush',
+        'yusuf', 'ahmet', 'mehmet', 'ugur', 'kerem', 'cem',
+        'fred', 'james', 'alex', 'diego', 'lee'
+    ];
+
+    function pickMaleVoice(voices, ttsLang) {
+        const langPrefix = ttsLang.split('-')[0];
+        const sameLangVoices = voices.filter(v =>
+            v.lang === ttsLang || (v.lang && v.lang.startsWith(langPrefix))
+        );
+        if (sameLangVoices.length === 0) return null;
+
+        let candidate = sameLangVoices.find(v => {
+            const n = v.name.toLowerCase();
+            return n.includes('male') && !n.includes('female');
+        });
+        if (candidate) return candidate;
+
+        candidate = sameLangVoices.find(v => {
+            const n = v.name.toLowerCase();
+            return knownMaleVoiceNames.some(name => n.includes(name));
+        });
+        if (candidate) return candidate;
+
+        candidate = sameLangVoices.find(v => {
+            const n = v.name.toLowerCase();
+            return !n.includes('female') && !n.includes('woman');
+        });
+        if (candidate) return candidate;
+
+        return sameLangVoices[0];
+    }
+
+    function toggleTafsirAudio(index) {
+        if (!window.speechSynthesis) {
+            alert('Sorry, your browser does not support text-to-speech.');
+            return;
+        }
+        if (currentTafsirIndex === index) {
+            stopTafsirAudio();
+            return;
+        }
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio = null;
+            document.querySelectorAll('.audio-btn').forEach(b => b.innerHTML = '▶');
+            document.querySelectorAll('.quran-card').forEach(c => c.classList.remove('playing-card'));
+            currentAyahIndex = -1;
+        }
+        window.speechSynthesis.cancel();
+
+        const text = tafsirTextList[index];
+        if (!text) return;
+
+        const t = translations[currentLang];
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = t.ttsLang;
+        utterance.rate = 0.95;
+
+        const voices = window.speechSynthesis.getVoices();
+        const matchedVoice = pickMaleVoice(voices, t.ttsLang);
+        if (matchedVoice) utterance.voice = matchedVoice;
+
+        if (currentTafsirIndex !== -1) {
+            const prevBtn = document.getElementById(`tafsir-audio-btn-${currentTafsirIndex}`);
+            if (prevBtn) prevBtn.innerHTML = '🔊';
+        }
+
+        currentTafsirIndex = index;
+        const btn = document.getElementById(`tafsir-audio-btn-${index}`);
+        if (btn) btn.innerHTML = '⏸';
+
+        utterance.onend = function() {
+            const b = document.getElementById(`tafsir-audio-btn-${index}`);
+            if (b) b.innerHTML = '🔊';
+            currentTafsirIndex = -1;
+            currentTafsirUtterance = null;
+        };
+        utterance.onerror = function() {
+            const b = document.getElementById(`tafsir-audio-btn-${index}`);
+            if (b) b.innerHTML = '🔊';
+            currentTafsirIndex = -1;
+            currentTafsirUtterance = null;
+        };
+
+        currentTafsirUtterance = utterance;
+        window.speechSynthesis.speak(utterance);
     }
 
     function playAyah(index) {
@@ -1021,6 +1170,7 @@
 
         stopAllAudio();
         ayahsAudioList = [];
+        tafsirTextList = [];
 
         displayArea.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-muted);">Lade Sure ${surahId}...</div>`;
 
@@ -1065,6 +1215,7 @@
                     const trText = ayahsTr ? ayahsTr[i].text : "";
                     const translitText = ayahsTranslit ? ayahsTranslit[i].text : "";
                     const tafsirText = ayahsTafsir ? ayahsTafsir[i].text : "Keine Erläuterung verfügbar.";
+                    tafsirTextList.push(tafsirText.replace(/<[^>]*>/g, ''));
 
                     let translitHtml = '';
                     if (t.transliterationNeeded && translitText) {
@@ -1084,7 +1235,10 @@
                         ${translitHtml}
                         ${translationHtml}
                         <div class="quran-tafsir">
-                            <div class="tafsir-title">${t.tafsirLabel}</div>
+                            <div class="tafsir-title-row">
+                                <div class="tafsir-title">${t.tafsirLabel}</div>
+                                <button class="tafsir-audio-btn" id="tafsir-audio-btn-${i}" onclick="toggleTafsirAudio(${i})" title="${t.listenTafsir}">🔊</button>
+                            </div>
                             ${tafsirText}
                         </div>
                     `;

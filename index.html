@@ -144,7 +144,6 @@
             display: block;
         }
 
-        /* شریتی سلایدی زیکر */
         .zikir-ticker-container {
             margin-bottom: 20px;
             background: linear-gradient(135deg, #e8f5e9, #f1f3f5);
@@ -162,7 +161,6 @@
             font-size: 14px;
             font-weight: 600;
             color: var(--primary);
-            /* لێرەدا ئاراستەی جووڵەکە دەگۆڕدرێت بەپێی زمانەکە */
             animation: tickerScrollLTR 25s linear infinite;
         }
 
@@ -203,7 +201,6 @@
             transition: all 0.3s ease;
         }
 
-        /* گۆڕینی لای چەپ بۆ ڕاست لە کاتی نوێژ بۆ کوردی، عەرەبی و فارسی */
         html[lang="ku"] .prayer-card,
         html[lang="ar"] .prayer-card,
         html[lang="fa"] .prayer-card {
@@ -550,7 +547,7 @@
         <div class="tab-content active" id="content-prayer">
             <div class="zikir-ticker-container">
                 <div class="zikir-ticker-text" id="ticker-text">
-                    ⭐ سبحان الله و بحمده، سبحان الله العظيم ⭐ لا إله إلا الله وحدە لا شريك له ⭐ استغفر الله واتوب إليه ⭐
+                    ⭐ سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ ⭐ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ ⭐ أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ وَأَتُوبُ إِلَيْهِ ⭐
                 </div>
             </div>
 
@@ -632,10 +629,10 @@
 
     const tickerZikirs = {
         de: "⭐ Subhanallah wa bihamdihi ⭐ Alhamdulillah ⭐ Allahu Akbar ⭐ La ilaha illallah ⭐ Astaghfirullah wa atubu ilaih ⭐",
-        ku: "⭐ سوبحان الله و بەحەمدەჰ، سوبحان الله العەظیم ⭐ لا إله إلا الله وحدە لا شريك له ⭐ ئەستەغفیروڵڵا و ئەتووبوو إِلەیھ ⭐",
-        fa: "⭐ سبحان الله و بحمده ⭐ الحمد لله ⭐ الله أكبر ⭐ لا إله إلا الله ⭐ استغفر الله و اتوب إليه ⭐",
+        ku: "⭐ سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ ⭐ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ ⭐ أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ وَأَتُوبُ إِلَيْهِ ⭐",
+        fa: "⭐ سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ ⭐ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ ⭐ أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ وَأَتُوبُ إِلَيْهِ ⭐",
         tr: "⭐ Sübhanallahi ve bihamdihi ⭐ Elhamdülillah ⭐ Allahu Ekber ⭐ La ilahe illallah ⭐ Estağfirullah ve etübü ileyh ⭐",
-        ar: "⭐ سبحان الله وبحمده، سبحان الله العظيم ⭐ لا إله إلا الله وحده لا شريك له ⭐ أستغفر الله وأتوب إليه ⭐"
+        ar: "⭐ سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ ⭐ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ ⭐ أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ وَأَتُوبُ إِلَيْهِ ⭐"
     };
 
     const surahListNames = [
@@ -765,36 +762,36 @@
             {title: "Salawat auf den Propheten ﷺ", text: "O Allah, segne Muhammad und die Familie Muhammads.", count: "10 Mal"}
         ],
         ku: [
-            {title: "سوبحان الله", text: "سُبْحَانَ اللَّهِ (پاکی بۆ خوای گەورە)", count: "٣٣ جار"},
-            {title: "الحمد لله", text: "الْحَمْدُ لِلَّهِ (سوپاس بۆ خوای گەورە)", count: "٣٣ جار"},
-            {title: "الله أكبر", text: "اللَّهُ أَكْبَرُ (خوای گەورە لە هەموو شتێک گەورەترە)", count: "٣٣ جار"},
-            {title: "لا إله إلا الله وحدە", text: "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ", count: "١ جار"},
-            {title: "استغفر الله", text: "أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ وَأَتُوبُ إِلَيْهِ (داوای لێخۆشبوون لە خوای گەورە دەکەم)", count: "١٠٠ جار"},
-            {title: "صەڵەوات لەسەر پێغەمبەر ﷺ", text: "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ", count: "١٠ جار"}
+            {title: "سوبحان الله", text: "«سُبْحَانَ اللَّهِ» (پاکی بۆ خوای گەورە)", count: "٣٣ جار"},
+            {title: "الحمد لله", text: "«الْحَمْدُ لِلَّهِ» (سوپاس و ستایش بۆ خوای گەورە)", count: "٣٣ جار"},
+            {title: "الله أكبر", text: "«اللَّهُ أَكْبَرُ» (خوای گەورە لە هەموو شتێک گەورەترە)", count: "٣٣ جار"},
+            {title: "زیکری گەورەی تەحلیل", text: "«لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ»", count: "١ جار"},
+            {title: "استغفار", text: "«أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ وَأَتُوبُ إِلَيْهِ» (داوای لێخۆشبوون لە خوای گەورەی مەزن دەکەم و تۆبە دەکەم بۆ لای)", count: "١٠٠ جار"},
+            {title: "صەڵەوات لەسەر پێغەمبەر ﷺ", text: "«اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ»", count: "١٠ جار"}
         ],
         fa: [
-            {title: "سبحان الله", text: "سبحان الله (پاک و منزه است خداوند)", count: "۳۳ بار"},
-            {title: "الحمد لله", text: "الحمد لله (ستایش مخصوص خداوند است)", count: "۳۳ بار"},
-            {title: "الله أكبر", text: "الله أكبر (خوند بزرگتر از آن است که وصف شود)", count: "۳۳ بار"},
-            {title: "لا إله إلا الله وحدە", text: "معبودی جز خداوند یگانه نیست که شریکی ندارد، پادشاهی و ستایش از آن اوست و او بر هر چیزی تواناست.", count: "۱ بار"},
-            {title: "استغفر الله", text: "از خداوند بزرگ آمرزش می‌طلبم و به سوی او بازمی‌گردم.", count: "۱۰۰ بار"},
-            {title: "صلوات بر پیامبر ﷺ", text: "بار خدایا بر محمد و خاندان محمد درود فرست.", count: "۱۰ بار"}
+            {title: "سبحان الله", text: "«سُبْحَانَ اللَّهِ» (پاک و منزه است خداوند)", count: "۳۳ بار"},
+            {title: "الحمد لله", text: "«الْحَمْدُ لِلَّهِ» (ستایش مخصوص پروردگار است)", count: "۳۳ بار"},
+            {title: "الله أكبر", text: "«اللَّهُ أَكْبَرُ» (خداوند بزرگتر از آن است که وصف شود)", count: "۳۳ بار"},
+            {title: "ذکر شریف توحید", text: "«لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ»", count: "۱ بار"},
+            {title: "استغفار و توبه", text: "«أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ وَأَتُوبُ إِلَيْهِ» (از خداوند بزرگ آمرزش می‌طلبم و به سوی او بازمی‌گردم)", count: "۱۰۰ بار"},
+            {title: "صلوات بر پیامبر گرامی ﷺ", text: "«اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ»", count: "۱۰ بار"}
         ],
         tr: [
             {title: "Sübhanallah", text: "Sübhanallah (Allah'ı bütün noksanlıklardan tenzih ederim)", count: "33 Defa"},
             {title: "Elhamdülillah", text: "Elhamdülillah (Hamd Allah'a mahsustur)", count: "33 Defa"},
             {title: "Allahu Ekber", text: "Allahu Ekber (Allah en büyüktür)", count: "33 Defa"},
             {title: "La ilahe illallah", text: "Allah'tan başka ilah yoktur, yalnız o vardır, hiçbir ortağı yoktur. Mülk O'nundur, hamd O'na mahsustur ve O her şeye kadirdir.", count: "1 Defa"},
-            {title: "Estağfirullah", text: "Yüce Allah'tan bağışlanma diler و O'na tövbe ederim.", count: "100 Defa"},
+            {title: "Estağfirullah", text: "Yüce Allah'tan bağışlanma diler ve O'na tövbe ederim.", count: "100 Defa"},
             {title: "Peygamber Efendimize Salavat ﷺ", text: "Allah'ım! Muhammed'e ve Muhammed'in ailesine rahmet eyle.", count: "10 Defa"}
         ],
         ar: [
-            {title: "سوبحان الله", text: "سُبْحَانَ اللَّهِ", count: "٣٣ مرة"},
-            {title: "الحمد لله", text: "الْحَمْدُ لِلَّهِ", count: "٣٣ مرة"},
-            {title: "الله أكبر", text: "اللَّهُ أَكْبَرُ", count: "٣٣ مرة"},
-            {title: "لا إله إلا الله وحدە", text: "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ", count: "١ مرة"},
-            {title: "استغفر الله", text: "أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ وَأَتُوبُ إِلَيْهِ", count: "١٠٠ مرة"},
-            {title: "صەڵەوات لەسەر پێغەمبەر ﷺ", text: "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ", count: "١٠ مرة"}
+            {title: "التسبيح (سُبْحَانَ اللَّهِ)", text: "«سُبْحَانَ اللَّهِ»", count: "٣٣ مرة"},
+            {title: "الحمد (الْحَمْدُ لِلَّهِ)", text: "«الْحَمْدُ لِلَّهِ»", count: "٣٣ مرة"},
+            {title: "التكبير (اللَّهُ أَكْبَرُ)", text: "«اللَّهُ أَكْبَرُ»", count: "٣٣ مرة"},
+            {title: "تهليل التوحيد", text: "«لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ»", count: "١ مرة"},
+            {title: "الاستغفار العظيم", text: "«أَسْتَغْفِرُ اللَّهَ الْعَظِيمَ وَأَتُوبُ إِلَيْهِ»", count: "١٠٠ مرة"},
+            {title: "الصلاة على النبي ﷺ", text: "«اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ»", count: "١٠ مرة"}
         ]
     };
 
@@ -803,12 +800,12 @@
             dir: 'ltr',
             title: 'Gebetszeiten & Koran',
             city: 'in der Stadt Köln',
-            fajr: 'Fandsch / Morgengebet (Fajr)',
+            fajr: 'Fajr (Morgengebet)',
             sunrise: 'Sonnenaufgang',
-            dhuhr: 'Mittagsgebet (Dhuhr)',
-            asr: 'Nachmittagsgebet (Asr)',
-            maghrib: 'Abendgebet (Maghrib)',
-            isha: 'Nachtgebet (Isha)',
+            dhuhr: 'Dhuhr (Mittagsgebet)',
+            asr: 'Asr (Nachmittagsgebet)',
+            maghrib: 'Maghrib (Abendgebet)',
+            isha: 'Isha (Nachtgebet)',
             qrTitle: 'QR-Code für diese Seite',
             qrDesc: 'Scannen Sie diesen Code, um diese App direkt zu sehen',
             footer: 'Gebetszeiten in der Stadt Köln ©',
@@ -1227,8 +1224,6 @@
         document.getElementById('lbl-fajr').innerText = t.fajr;
         document.getElementById('lbl-sunrise').innerText = t.sunrise;
         document.getElementById('lbl-dhuhr').innerText = t.dhuhr;
-        document.getElementById('lbl-asr').innerText, t.asr;
-        // Fixing property assignment safely
         document.getElementById('lbl-asr').innerText = t.asr;
         document.getElementById('lbl-maghrib').innerText = t.maghrib;
         document.getElementById('lbl-isha').innerText = t.isha;
@@ -1321,4 +1316,3 @@
 
 </body>
 </html>
-u
